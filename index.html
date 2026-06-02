@@ -149,6 +149,16 @@ font-weight:700;
 margin-top:10px;
 }
 
+input{
+width:100%;
+padding:10px;
+border:none;
+border-radius:10px;
+margin-top:10px;
+margin-bottom:10px;
+font-size:16px;
+}
+
 </style>
 
 </head>
@@ -174,10 +184,19 @@ margin-top:10px;
 
 <div class="card">
 <div class="card-top">
-<h2>Tanah</h2>
+<h2>Kelembaban Tanah</h2>
 <i class="fa-solid fa-seedling"></i>
 </div>
-<div class="value" id="tanah">0</div>
+
+<div class="value">
+<span id="soilPercent">0</span>%
+</div>
+
+<div style="margin-top:10px;font-size:13px;color:#ccc">
+ADC :
+<span id="tanah">0</span>
+</div>
+
 </div>
 
 <div class="card">
@@ -335,7 +354,106 @@ Atap
 </div>
 
 </div>
+<div class="control-section">
 
+<h2>⚙️ Threshold Setting</h2>
+
+<div class="control-grid">
+
+<div class="control-card">
+
+<h3>Suhu Dingin</h3>
+
+<input type="number" id="suhuDingin">
+
+<button class="on"
+onclick="saveThreshold('suhu_dingin','suhuDingin')">
+Simpan
+</button>
+
+</div>
+
+<div class="control-card">
+
+<h3>Suhu Panas</h3>
+
+<input type="number" id="suhuPanas">
+
+<button class="on"
+onclick="saveThreshold('suhu_panas','suhuPanas')">
+Simpan
+</button>
+
+</div>
+
+<div class="control-card">
+
+<h3>Tanah Kering</h3>
+
+<input type="number" id="tanahKering">
+
+<button class="on"
+onclick="saveThreshold('tanah_kering','tanahKering')">
+Simpan
+</button>
+
+</div>
+
+<div class="control-card">
+
+<h3>Tanah Normal</h3>
+
+<input type="number" id="tanahNormal">
+
+<button class="on"
+onclick="saveThreshold('tanah_normal','tanahNormal')">
+Simpan
+</button>
+
+</div>
+
+<div class="control-card">
+
+<h3>Batas Hujan</h3>
+
+<input type="number" id="hujanLimit">
+
+<button class="on"
+onclick="saveThreshold('hujan','hujanLimit')">
+Simpan
+</button>
+
+</div>
+
+<div class="control-card">
+
+<h3>Batas Cahaya</h3>
+
+<input type="number" id="cahayaLimit">
+
+<button class="on"
+onclick="saveThreshold('cahaya','cahayaLimit')">
+Simpan
+</button>
+
+</div>
+
+<div class="control-card">
+
+<h3>Tangki Minimum</h3>
+
+<input type="number" id="tangkiMin">
+
+<button class="on"
+onclick="saveThreshold('tangki_min','tangkiMin')">
+Simpan
+</button>
+
+</div>
+
+</div>
+
+</div>
 <div class="chart-card">
 <h2>Grafik Suhu Realtime</h2>
 <canvas id="tempChart"></canvas>
@@ -379,7 +497,10 @@ bind("tanah","greenhouse/sensor/tanah");
 bind("hujan","greenhouse/sensor/hujan");
 bind("cahaya","greenhouse/sensor/cahaya");
 bind("tangki","greenhouse/sensor/tangki");
-
+bind(
+  "soilPercent",
+  "greenhouse/sensor/kelembaban_tanah"
+);
 bind("cuaca","greenhouse/status/cuaca");
 bind("kipas","greenhouse/status/kipas");
 bind("pompa","greenhouse/status/pompa");
@@ -404,7 +525,75 @@ window.buzzerOff=()=>set(ref(db,"greenhouse/control/buzzer"),false);
 
 window.atapBuka=()=>set(ref(db,"greenhouse/control/atap"),true);
 window.atapTutup=()=>set(ref(db,"greenhouse/control/atap"),false);
+function loadThreshold(id,path){
 
+onValue(
+ref(db,path),
+(s)=>{
+
+document.getElementById(id).value =
+s.val();
+
+});
+
+}
+
+loadThreshold(
+"suhuDingin",
+"greenhouse/threshold/suhu_dingin"
+);
+
+loadThreshold(
+"suhuPanas",
+"greenhouse/threshold/suhu_panas"
+);
+
+loadThreshold(
+"tanahKering",
+"greenhouse/threshold/tanah_kering"
+);
+
+loadThreshold(
+"tanahNormal",
+"greenhouse/threshold/tanah_normal"
+);
+
+loadThreshold(
+"hujanLimit",
+"greenhouse/threshold/hujan"
+);
+
+loadThreshold(
+"cahayaLimit",
+"greenhouse/threshold/cahaya"
+);
+
+loadThreshold(
+"tangkiMin",
+"greenhouse/threshold/tangki_min"
+);
+
+window.saveThreshold = (
+firebaseKey,
+inputId
+)=>{
+
+const value =
+Number(
+document.getElementById(inputId).value
+);
+
+set(
+ref(
+db,
+"greenhouse/threshold/"+firebaseKey
+),
+value
+);
+
+alert("Threshold berhasil disimpan");
+
+};
 const ctx=document.getElementById("tempChart");
 
 const chart=new Chart(ctx,{
