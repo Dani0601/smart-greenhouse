@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart Greenhouse Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+}
+
+.header h1{
+font-size:32px;
+}
+
+.online{
+background:#22c55e;
+padding:8px 18px;
+border-radius:20px;
+font-weight:600;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+}
+
+.card{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(15px);
+border-radius:20px;
+padding:20px;
+box-shadow:0 8px 25px rgba(0,0,0,.3);
+}
+
+.card-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+}
+
+.card h2{
+font-size:18px;
+font-weight:500;
+}
+
+.value{
+font-size:38px;
+font-weight:700;
+}
+
+.control-section{
+margin-top:40px;
+}
+
+.control-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.control-card{
+background:rgba(255,255,255,0.08);
+padding:20px;
+border-radius:20px;
+text-align:center;
+}
+
+.btn-group{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-top:15px;
+flex-wrap:wrap;
+}
+
+button{
+border:none;
+padding:10px 18px;
+border-radius:10px;
+font-weight:600;
+cursor:pointer;
+}
+
+.on{
+background:#22c55e;
+color:white;
+}
+
+.off{
+background:#ef4444;
+color:white;
+}
+
+.chart-card{
+margin-top:40px;
+background:rgba(255,255,255,0.08);
+padding:20px;
+border-radius:20px;
+}
+
+.status-grid{
+margin-top:30px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+}
+
+.status-box{
+background:rgba(255,255,255,0.08);
+padding:20px;
+border-radius:20px;
+text-align:center;
+}
+
+.status-value{
+font-size:22px;
+font-weight:700;
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+<h1>🌱 Smart Greenhouse</h1>
+<div class="online">ONLINE</div>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<div class="card-top">
+<h2>Suhu</h2>
+<i class="fa-solid fa-temperature-high"></i>
+</div>
+<div class="value">
+<span id="suhu">0</span>°C
+</div>
+</div>
+
+<div class="card">
+<div class="card-top">
+<h2>Tanah</h2>
+<i class="fa-solid fa-seedling"></i>
+</div>
+<div class="value" id="tanah">0</div>
+</div>
+
+<div class="card">
+<div class="card-top">
+<h2>Hujan</h2>
+<i class="fa-solid fa-cloud-rain"></i>
+</div>
+<div class="value" id="hujan">0</div>
+</div>
+
+<div class="card">
+<div class="card-top">
+<h2>Cahaya</h2>
+<i class="fa-solid fa-sun"></i>
+</div>
+<div class="value" id="cahaya">0</div>
+</div>
+
+<div class="card">
+<div class="card-top">
+<h2>Tangki</h2>
+<i class="fa-solid fa-water"></i>
+</div>
+<div class="value">
+<span id="tangki">0</span> cm
+</div>
+</div>
+
+</div>
+
+<div class="status-grid">
+
+<div class="status-box">
+Cuaca
+<div id="cuaca" class="status-value">-</div>
+</div>
+
+<div class="status-box">
+Kipas
+<div id="kipas" class="status-value">-</div>
+</div>
+
+<div class="status-box">
+Pompa
+<div id="pompa" class="status-value">-</div>
+</div>
+
+<div class="status-box">
+UV
+<div id="uv" class="status-value">-</div>
+</div>
+
+<div class="status-box">
+Buzzer
+<div id="buzzer" class="status-value">-</div>
+</div>
+
+<div class="status-box">
+Atap
+<div id="atap" class="status-value">-</div>
+</div>
+
+</div>
+
+<div class="control-section">
+
+<h2>Manual Control</h2>
+
+<div class="control-grid">
+
+<div class="control-card">
+
+<h3>⚙️ Mode</h3>
+
+<div class="btn-group">
+
+<button class="on" onclick="setAuto()">AUTO</button>
+
+<button class="off" onclick="setManual()">MANUAL</button>
+
+</div>
+
+</div>
+
+<div class="control-card">
+
+<h3>🌪️ Kipas</h3>
+
+<div class="btn-group">
+
+<button class="on" onclick="kipasOn()">ON</button>
+
+<button class="off" onclick="kipasOff()">OFF</button>
+
+</div>
+
+</div>
+
+<div class="control-card">
+
+<h3>💧 Pompa</h3>
+
+<div class="btn-group">
+
+<button class="on" onclick="pompaOn()">ON</button>
+
+<button class="off" onclick="pompaOff()">OFF</button>
+
+</div>
+
+</div>
+
+<div class="control-card">
+
+<h3>☀️ UV</h3>
+
+<div class="btn-group">
+
+<button class="on" onclick="uvOn()">ON</button>
+
+<button class="off" onclick="uvOff()">OFF</button>
+
+</div>
+
+</div>
+
+<div class="control-card">
+
+<h3>🔔 Buzzer</h3>
+
+<div class="btn-group">
+
+<button class="on" onclick="buzzerOn()">ON</button>
+
+<button class="off" onclick="buzzerOff()">OFF</button>
+
+</div>
+
+</div>
+
+<div class="control-card">
+
+<h3>🏠 Atap</h3>
+
+<div class="btn-group">
+
+<button class="on" onclick="atapBuka()">BUKA</button>
+
+<button class="off" onclick="atapTutup()">TUTUP</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="chart-card">
+<h2>Grafik Suhu Realtime</h2>
+<canvas id="tempChart"></canvas>
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+onValue,
+set
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+apiKey:"API_KEY",
+authDomain:"PROJECT.firebaseapp.com",
+databaseURL:"https://PROJECT-default-rtdb.firebaseio.com",
+projectId:"PROJECT",
+storageBucket:"PROJECT.appspot.com",
+messagingSenderId:"XXXX",
+appId:"XXXX"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+function bind(id,path){
+onValue(ref(db,path),(s)=>{
+document.getElementById(id).innerHTML=s.val();
+});
+}
+
+bind("suhu","greenhouse/sensor/suhu");
+bind("tanah","greenhouse/sensor/tanah");
+bind("hujan","greenhouse/sensor/hujan");
+bind("cahaya","greenhouse/sensor/cahaya");
+bind("tangki","greenhouse/sensor/tangki");
+
+bind("cuaca","greenhouse/status/cuaca");
+bind("kipas","greenhouse/status/kipas");
+bind("pompa","greenhouse/status/pompa");
+bind("uv","greenhouse/status/uv");
+bind("buzzer","greenhouse/status/buzzer");
+bind("atap","greenhouse/status/atap");
+
+window.setAuto=()=>set(ref(db,"greenhouse/control/mode"),"auto");
+window.setManual=()=>set(ref(db,"greenhouse/control/mode"),"manual");
+
+window.kipasOn=()=>set(ref(db,"greenhouse/control/kipas"),true);
+window.kipasOff=()=>set(ref(db,"greenhouse/control/kipas"),false);
+
+window.pompaOn=()=>set(ref(db,"greenhouse/control/pompa"),true);
+window.pompaOff=()=>set(ref(db,"greenhouse/control/pompa"),false);
+
+window.uvOn=()=>set(ref(db,"greenhouse/control/uv"),true);
+window.uvOff=()=>set(ref(db,"greenhouse/control/uv"),false);
+
+window.buzzerOn=()=>set(ref(db,"greenhouse/control/buzzer"),true);
+window.buzzerOff=()=>set(ref(db,"greenhouse/control/buzzer"),false);
+
+window.atapBuka=()=>set(ref(db,"greenhouse/control/atap"),true);
+window.atapTutup=()=>set(ref(db,"greenhouse/control/atap"),false);
+
+const ctx=document.getElementById("tempChart");
+
+const chart=new Chart(ctx,{
+type:"line",
+data:{
+labels:[],
+datasets:[{
+label:"Suhu °C",
+data:[]
+}]
+}
+});
+
+onValue(ref(db,"greenhouse/sensor/suhu"),(s)=>{
+
+const temp=s.val();
+
+chart.data.labels.push(
+new Date().toLocaleTimeString()
+);
+
+chart.data.datasets[0].data.push(temp);
+
+if(chart.data.labels.length>20){
+chart.data.labels.shift();
+chart.data.datasets[0].data.shift();
+}
+
+chart.update();
+
+});
+
+</script>
+
+</body>
+</html>
